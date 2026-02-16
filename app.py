@@ -142,15 +142,5 @@ def _open_in_chrome(url):
                 pass
     try:
         webbrowser.get('chrome').open_new_tab(url)
-        return
-    except Exception:
-        pass
-    webbrowser.open_new_tab(url)
-
-
 if __name__ == "__main__":
-    url = "http://127.0.0.1:5000/"
-    timer = threading.Timer(1.0, _open_in_chrome, args=(url,))
-    timer.daemon = True
-    timer.start()
-    app.run(debug=True)
+    app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
