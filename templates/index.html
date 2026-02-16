@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>SecurePass</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">🔐 SecurePass</h1>
+        <p class="text-center">Your Ultimate Password Security & Encryption Tool</p>
+        <hr>
+
+        <div class="row">
+            <!-- Password Checker -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Password Strength Checker</h5>
+                        <form method="POST">
+                            <input type="hidden" name="action" value="check">
+                            <input type="text" name="password" class="form-control" placeholder="Enter password" required>
+                            <button type="submit" class="btn btn-primary mt-2">Check</button>
+                        </form>
+                        {% if result %}
+                            <div class="alert mt-3 {{ 'alert-success' if result=='Strong' else ('alert-warning' if result=='Medium' else 'alert-danger') }}">
+                                Strength: {{ result }}
+                            </div>
+                            {% if suggested_password %}
+                                <div class="alert alert-info mt-2">
+                                    <strong>Suggested Strong Password:</strong><br>
+                                    <code id="suggested-password">{{ suggested_password }}</code>
+                                    <button class="btn btn-sm btn-outline-primary ms-2" onclick="copyToClipboard('suggested-password')">Copy</button>
+                                </div>
+                            {% endif %}
+                            {% if tips and tips|length > 0 %}
+                                <ul class="list-group">
+                                    {% for t in tips %}
+                                        <li class="list-group-item">{{ t }}</li>
+                                    {% endfor %}
+                                </ul>
+                            {% endif %}
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Encryption / Decryption -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Encryption</h5>
+                        <p class="small text-muted">Session Key: <code>{{ show_key }}</code></p>
+
+                        <form method="POST" class="mb-3">
+                            <input type="hidden" name="action" value="enc">
+                            <textarea name="message" class="form-control" rows="3" placeholder="Enter message to encrypt" required></textarea>
+                            <button type="submit" class="btn btn-success mt-2">Encrypt</button>
+                        </form>
+                        {% if encrypted %}
+                            <div class="alert alert-warning">Ciphertext: <code id="encrypted-text">{{ encrypted }}</code> <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copyToClipboard('encrypted-text')">Copy</button></div>
+                        {% endif %}
+
+                        <form method="POST">
+                            <input type="hidden" name="action" value="dec">
+                            <textarea name="enc_message" class="form-control" rows="3" placeholder="Paste ciphertext to decrypt" required></textarea>
+                            <button type="submit" class="btn btn-secondary mt-2">Decrypt</button>
+                        </form>
+                        {% if decrypted %}
+                            <div class="alert alert-info mt-2">Plaintext: {{ decrypted }}</div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <script>
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent || element.innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                alert('Text copied to clipboard!');
+            }).catch(err => {
+                console.error('Failed to copy text: ', err);
+                alert('Failed to copy text.');
+            });
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,24 @@
+body { background-color: #f7f9fc; }
+h1 { color: #1f2937; }
+.card { border-radius: 12px; box-shadow: 0 8px 20px rgba(0,0,0,0.05); }
+.card-title { color: #0f172a; }
+textarea, input { border-radius: 8px; }
+
+/* Start overlay styles */
+.start-overlay {
+	position: fixed;
+	inset: 0;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background: rgba(15, 23, 42, 0.6);
+	z-index: 9999;
+}
+.start-card {
+	background: #fff;
+	padding: 2rem;
+	border-radius: 12px;
+	box-shadow: 0 12px 40px rgba(2,6,23,0.4);
+	max-width: 420px;
+	width: 90%;
+}
