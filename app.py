@@ -142,5 +142,8 @@ def _open_in_chrome(url):
                 pass
     try:
         webbrowser.get('chrome').open_new_tab(url)
+    except Exception:
+        pass
+
 if __name__ == "__main__":
     app.run(debug=False, host='0.0.0.0', port=int(os.environ.get('PORT', 5000)))
