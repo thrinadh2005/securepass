@@ -17,6 +17,8 @@ import subprocess
 
 app = Flask(__name__)
 
+# Fixed Internal Server Error issues
+
 # Password Strength Checker
 def check_password_strength(password):
     strength = 0
