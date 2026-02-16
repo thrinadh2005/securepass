@@ -2,73 +2,264 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>SecurePass</title>
+    <title>SecurePass - Advanced Security Tools</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        .tool-section {
+            margin-bottom: 20px;
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .entropy-meter {
+            height: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+        .entropy-fill {
+            height: 100%;
+            transition: width 0.3s ease;
+        }
+        .entropy-weak { background: #dc3545; }
+        .entropy-medium { background: #ffc107; }
+        .entropy-strong { background: #28a745; }
+    </style>
 </head>
 <body>
-    <div class="container mt-5">
-        <h1 class="text-center">🔐 SecurePass</h1>
-        <p class="text-center">Your Ultimate Password Security & Encryption Tool</p>
-        <hr>
-
+    <div class="container mt-4">
+        <h1 class="text-center mb-4">🔐 SecurePass - Advanced Security Tools</h1>
+        <p class="text-center text-muted">Comprehensive Password Security & Cryptography Suite</p>
+        
         <div class="row">
-            <!-- Password Checker -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Password Strength Checker</h5>
-                        <form method="POST">
-                            <input type="hidden" name="action" value="check">
-                            <input type="text" name="password" class="form-control" placeholder="Enter password" required>
-                            <button type="submit" class="btn btn-primary mt-2">Check</button>
-                        </form>
-                        {% if result %}
-                            <div class="alert mt-3 {{ 'alert-success' if result=='Strong' else ('alert-warning' if result=='Medium' else 'alert-danger') }}">
-                                Strength: {{ result }}
-                            </div>
-                            {% if suggested_password %}
-                                <div class="alert alert-info mt-2">
-                                    <strong>Suggested Strong Password:</strong><br>
-                                    <code id="suggested-password">{{ suggested_password }}</code>
-                                    <button class="btn btn-sm btn-outline-primary ms-2" onclick="copyToClipboard('suggested-password')">Copy</button>
+            <!-- Password Strength Checker -->
+            <div class="col-lg-6 mb-4">
+                <div class="tool-section">
+                    <h5 class="mb-3">🔍 Password Strength Checker</h5>
+                    <form method="POST">
+                        <input type="hidden" name="action" value="check">
+                        <div class="form-group">
+                            <input type="password" name="password" class="form-control" placeholder="Enter password to check" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Check Strength</button>
+                    </form>
+                    
+                    {% if result %}
+                        <div class="alert mt-3 {{ 'alert-success' if result=='Strong' else ('alert-warning' if result=='Medium' else 'alert-danger') }}">
+                            <strong>Strength:</strong> {{ result }}
+                            {% if entropy %}
+                                <br><strong>Entropy:</strong> {{ entropy }} bits
+                                <div class="entropy-meter mt-2">
+                                    <div class="entropy-fill {{ 'entropy-weak' if entropy < 40 else ('entropy-medium' if entropy < 60 else 'entropy-strong') }}" 
+                                         style="width: {{ (entropy/100 * 100)|round }}%"></div>
                                 </div>
                             {% endif %}
-                            {% if tips and tips|length > 0 %}
-                                <ul class="list-group">
-                                    {% for t in tips %}
-                                        <li class="list-group-item">{{ t }}</li>
-                                    {% endfor %}
-                                </ul>
-                            {% endif %}
+                        </div>
+                        {% if suggested_password %}
+                            <div class="alert alert-info mt-2">
+                                <strong>Suggested Strong Password:</strong><br>
+                                <code id="suggested-password">{{ suggested_password }}</code>
+                                <button class="btn btn-sm btn-outline-primary ml-2" onclick="copyToClipboard('suggested-password')">Copy</button>
+                            </div>
                         {% endif %}
-                    </div>
+                        {% if tips and tips|length > 0 %}
+                            <h6 class="mt-3">Improvement Tips:</h6>
+                            <ul class="list-group">
+                                {% for t in tips %}
+                                    <li class="list-group-item">{{ t }}</li>
+                                {% endfor %}
+                            </ul>
+                        {% endif %}
+                    {% endif %}
                 </div>
             </div>
 
-            <!-- Encryption / Decryption -->
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">Encryption</h5>
-                        <p class="small text-muted">Session Key: <code>{{ show_key }}</code></p>
+            <!-- Advanced Password Generator -->
+            <div class="col-lg-6 mb-4">
+                <div class="tool-section">
+                    <h5 class="mb-3">🎲 Advanced Password Generator</h5>
+                    <form method="POST">
+                        <input type="hidden" name="action" value="generate_custom">
+                        <div class="form-group">
+                            <label>Password Length:</label>
+                            <input type="number" name="length" class="form-control" value="16" min="8" max="64">
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" name="include_uppercase" class="form-check-input" checked>
+                            <label class="form-check-label">Include Uppercase (A-Z)</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" name="include_lowercase" class="form-check-input" checked>
+                            <label class="form-check-label">Include Lowercase (a-z)</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" name="include_digits" class="form-check-input" checked>
+                            <label class="form-check-label">Include Digits (0-9)</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" name="include_special" class="form-check-input" checked>
+                            <label class="form-check-label">Include Special Characters</label>
+                        </div>
+                        <div class="form-check">
+                            <input type="checkbox" name="exclude_ambiguous" class="form-check-input" checked>
+                            <label class="form-check-label">Exclude Ambiguous (0, O, l, 1, I)</label>
+                        </div>
+                        <button type="submit" class="btn btn-success mt-3">Generate Password</button>
+                    </form>
+                    
+                    {% if custom_password %}
+                        <div class="alert alert-success mt-3">
+                            <strong>Generated Password:</strong><br>
+                            <code id="custom-password">{{ custom_password }}</code>
+                            <button class="btn btn-sm btn-outline-primary ml-2" onclick="copyToClipboard('custom-password')">Copy</button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
 
-                        <form method="POST" class="mb-3">
-                            <input type="hidden" name="action" value="enc">
-                            <textarea name="message" class="form-control" rows="3" placeholder="Enter message to encrypt" required></textarea>
-                            <button type="submit" class="btn btn-success mt-2">Encrypt</button>
-                        </form>
-                        {% if encrypted %}
-                            <div class="alert alert-warning">Ciphertext: <code id="encrypted-text">{{ encrypted }}</code> <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copyToClipboard('encrypted-text')">Copy</button></div>
-                        {% endif %}
+        <div class="row">
+            <!-- Hashing Tools -->
+            <div class="col-lg-6 mb-4">
+                <div class="tool-section">
+                    <h5 class="mb-3">🔐 Hashing Tools</h5>
+                    
+                    <!-- SHA256 Hash -->
+                    <h6>SHA256 Hash</h6>
+                    <form method="POST" class="mb-3">
+                        <input type="hidden" name="action" value="sha256">
+                        <div class="form-group">
+                            <textarea name="sha256_text" class="form-control" rows="2" placeholder="Enter text to hash" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-info">Generate SHA256</button>
+                    </form>
+                    {% if sha256_result %}
+                        <div class="alert alert-info">
+                            <strong>SHA256:</strong><br>
+                            <code id="sha256-result">{{ sha256_result }}</code>
+                            <button class="btn btn-sm btn-outline-primary ml-2" onclick="copyToClipboard('sha256-result')">Copy</button>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Password Hashing -->
+                    <h6>Secure Password Hash (PBKDF2)</h6>
+                    <form method="POST" class="mb-3">
+                        <input type="hidden" name="action" value="hash_password">
+                        <div class="form-group">
+                            <input type="password" name="hash_pwd" class="form-control" placeholder="Enter password to hash" required>
+                        </div>
+                        <button type="submit" class="btn btn-warning">Hash Password</button>
+                    </form>
+                    {% if hashed_password %}
+                        <div class="alert alert-warning">
+                            <strong>Hashed Password:</strong><br>
+                            <code id="hashed-password">{{ hashed_password }}</code>
+                            <button class="btn btn-sm btn-outline-primary ml-2" onclick="copyToClipboard('hashed-password')">Copy</button>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Password Verification -->
+                    <h6>Password Verification</h6>
+                    <form method="POST">
+                        <input type="hidden" name="action" value="verify_password">
+                        <div class="form-group">
+                            <input type="password" name="verify_pwd" class="form-control mb-2" placeholder="Enter password" required>
+                            <input type="text" name="hashed_pwd" class="form-control" placeholder="Enter hashed password" required>
+                        </div>
+                        <button type="submit" class="btn btn-secondary">Verify Password</button>
+                    </form>
+                    {% if password_verified is not None %}
+                        <div class="alert mt-3 {{ 'alert-success' if password_verified else 'alert-danger' }}">
+                            <strong>Verification:</strong> {{ 'Password Match!' if password_verified else 'Password Does Not Match!' }}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
 
-                        <form method="POST">
-                            <input type="hidden" name="action" value="dec">
-                            <textarea name="enc_message" class="form-control" rows="3" placeholder="Paste ciphertext to decrypt" required></textarea>
-                            <button type="submit" class="btn btn-secondary mt-2">Decrypt</button>
-                        </form>
-                        {% if decrypted %}
-                            <div class="alert alert-info mt-2">Plaintext: {{ decrypted }}</div>
-                        {% endif %}
+            <!-- Encoding Tools -->
+            <div class="col-lg-6 mb-4">
+                <div class="tool-section">
+                    <h5 class="mb-3">🔄 Encoding Tools</h5>
+                    
+                    <!-- Base64 Encode -->
+                    <h6>Base64 Encode</h6>
+                    <form method="POST" class="mb-3">
+                        <input type="hidden" name="action" value="base64_encode">
+                        <div class="form-group">
+                            <textarea name="base64_text" class="form-control" rows="2" placeholder="Enter text to encode" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Encode to Base64</button>
+                    </form>
+                    {% if base64_encoded %}
+                        <div class="alert alert-info">
+                            <strong>Base64 Encoded:</strong><br>
+                            <code id="base64-encoded">{{ base64_encoded }}</code>
+                            <button class="btn btn-sm btn-outline-primary ml-2" onclick="copyToClipboard('base64-encoded')">Copy</button>
+                        </div>
+                    {% endif %}
+                    
+                    <!-- Base64 Decode -->
+                    <h6>Base64 Decode</h6>
+                    <form method="POST">
+                        <input type="hidden" name="action" value="base64_decode">
+                        <div class="form-group">
+                            <textarea name="base64_decode_text" class="form-control" rows="2" placeholder="Enter Base64 to decode" required></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Decode from Base64</button>
+                    </form>
+                    {% if base64_decoded %}
+                        <div class="alert alert-info">
+                            <strong>Decoded Text:</strong><br>
+                            <code id="base64-decoded">{{ base64_decoded }}</code>
+                            <button class="btn btn-sm btn-outline-primary ml-2" onclick="copyToClipboard('base64-decoded')">Copy</button>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Original Encryption Section -->
+        <div class="row">
+            <div class="col-12">
+                <div class="tool-section">
+                    <h5 class="mb-3">🔒 AES Encryption (Fernet)</h5>
+                    <p class="small text-muted">Session Key: <code>{{ show_key }}</code></p>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <form method="POST" class="mb-3">
+                                <input type="hidden" name="action" value="enc">
+                                <h6>Encrypt Message</h6>
+                                <div class="form-group">
+                                    <textarea name="message" class="form-control" rows="3" placeholder="Enter message to encrypt" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-success">Encrypt</button>
+                            </form>
+                            {% if encrypted %}
+                                <div class="alert alert-warning">
+                                    <strong>Ciphertext:</strong><br>
+                                    <code id="encrypted-text">{{ encrypted }}</code>
+                                    <button class="btn btn-sm btn-outline-secondary ml-2" onclick="copyToClipboard('encrypted-text')">Copy</button>
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6">
+                            <form method="POST">
+                                <input type="hidden" name="action" value="dec">
+                                <h6>Decrypt Message</h6>
+                                <div class="form-group">
+                                    <textarea name="enc_message" class="form-control" rows="3" placeholder="Paste ciphertext to decrypt" required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-secondary">Decrypt</button>
+                            </form>
+                            {% if decrypted %}
+                                <div class="alert alert-info mt-2">
+                                    <strong>Plaintext:</strong> {{ decrypted }}
+                                </div>
+                            {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
