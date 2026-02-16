@@ -169,7 +169,7 @@
                         </div>
                         <button type="submit" class="btn btn-secondary">Verify Password</button>
                     </form>
-                    {% if password_verified is not None %}
+                    {% if password_verified != None %}
                         <div class="alert mt-3 {{ 'alert-success' if password_verified else 'alert-danger' }}">
                             <strong>Verification:</strong> {{ 'Password Match!' if password_verified else 'Password Does Not Match!' }}
                         </div>
