@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, Response
+from flask import Flask, render_template, request
 import re
 import random
 import string
@@ -399,67 +399,6 @@ def index():
         active_section=active_section
     )
 
-
-@app.route("/download/tools-doc", methods=["GET"])
-def download_tools_doc():
-    doc = []
-    doc.append("# SecurePass Cryptography Tools Guide")
-    doc.append("")
-    doc.append("## Overview")
-    doc.append("SecurePass provides a hub of cryptography and security tools for analysis, hashing, encoding, and encryption.")
-    doc.append("")
-    doc.append("## Password Strength Checker")
-    doc.append("- Evaluates presence of uppercase, lowercase, digits, special characters")
-    doc.append("- Estimates entropy: entropy = length × log2(character_set_size)")
-    doc.append("- Suggests improvements and generates a strong password when weak/medium")
-    doc.append("Example: Enter 'P@ssw0rd123!' and check strength; view entropy and tips")
-    doc.append("")
-    doc.append("## Advanced Password Generator")
-    doc.append("- Custom length (8–64)")
-    doc.append("- Toggle character sets; ensures at least one from each selected type")
-    doc.append("Example: Length=16, include upper/lower/digits/special → copy generated")
-    doc.append("")
-    doc.append("## Hashing Tools")
-    doc.append("### PBKDF2 (Secure Password Hash)")
-    doc.append("- Algorithm: PBKDF2-HMAC-SHA256, 100,000 iterations, 32 bytes")
-    doc.append("- Format: salt:hash_hex")
-    doc.append("Example: Hash a password and verify by providing the same salt:hash")
-    doc.append("")
-    doc.append("### Digest (SHA1 / SHA256 / SHA512)")
-    doc.append("- Algorithms: hashlib SHA1/SHA256/SHA512")
-    doc.append("Example: Choose SHA512, enter text, copy hex digest")
-    doc.append("")
-    doc.append("### HMAC-SHA256")
-    doc.append("- Algorithm: HMAC with SHA256")
-    doc.append("- Generate and verify using a shared key")
-    doc.append("Example: Key='secret', Message='hello', compute HMAC and verify")
-    doc.append("")
-    doc.append("## Encoding Tools")
-    doc.append("### Base64")
-    doc.append("- Encode text to Base64 and decode back")
-    doc.append("Example: Encode 'SecurePass', then decode the result")
-    doc.append("")
-    doc.append("## Encryption")
-    doc.append("### AES (Fernet)")
-    doc.append("- Library: cryptography.Fernet (AES-CBC + HMAC, authenticated encryption)")
-    doc.append("- Per-session key; encrypt/decrypt messages")
-    doc.append("Example: Enter message → Encrypt; paste ciphertext → Decrypt")
-    doc.append("")
-    doc.append("### RSA (2048, OAEP-SHA256)")
-    doc.append("- Generate RSA key pair (public/private) for the session")
-    doc.append("- Encrypt with public key; decrypt with private key")
-    doc.append("- Padding: OAEP with SHA256 (MGF1-SHA256)")
-    doc.append("Example: Generate keys, encrypt message, then decrypt Base64 ciphertext")
-    doc.append("")
-    doc.append("## Notes")
-    doc.append("- Keys are session-scoped in memory; private keys are not displayed")
-    doc.append("- Do not reuse example secrets in production")
-    doc.append("")
-    content = "\n".join(doc)
-    headers = {
-        "Content-Disposition": "attachment; filename=SecurePass-Tools-Guide.md"
-    }
-    return Response(content, mimetype="text/markdown", headers=headers)
 
 
 def _open_in_chrome(url):
