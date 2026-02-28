@@ -206,6 +206,7 @@ def index():
     hashed_password = None
     password_verified = None
     custom_password = None
+    active_section = None
 
     if request.method == "POST":
         action = request.form.get("action")
@@ -214,10 +215,12 @@ def index():
             pwd = request.form.get("password", "")
             result, tips, suggested_password = check_password_strength(pwd)
             entropy = calculate_password_entropy(pwd)
+            active_section = "password-strength"
 
         elif action == "enc":
             msg = request.form.get("message", "")
             encrypted = cipher_suite.encrypt(msg.encode()).decode()
+            active_section = "encryption"
 
         elif action == "dec":
             enc_msg = request.form.get("enc_message", "")
@@ -225,6 +228,7 @@ def index():
                 decrypted = cipher_suite.decrypt(enc_msg.encode()).decode()
             except Exception:
                 decrypted = "Invalid key or ciphertext."
+            active_section = "encryption"
 
         elif action == "generate_custom":
             length = int(request.form.get("length", 16))
@@ -235,27 +239,33 @@ def index():
             exclude_ambiguous = request.form.get("exclude_ambiguous") == "on"
             custom_password = generate_custom_password(length, include_uppercase, include_lowercase, 
                                               include_digits, include_special, exclude_ambiguous)
+            active_section = "password-generator"
 
         elif action == "sha256":
             text = request.form.get("sha256_text", "")
             sha256_result = sha256_hash(text)
+            active_section = "hashing-tools"
 
         elif action == "base64_encode":
             text = request.form.get("base64_text", "")
             base64_encoded = base64_encode(text)
+            active_section = "encoding-tools"
 
         elif action == "base64_decode":
             text = request.form.get("base64_decode_text", "")
             base64_decoded = base64_decode(text)
+            active_section = "encoding-tools"
 
         elif action == "hash_password":
             pwd = request.form.get("hash_pwd", "")
             hashed_password = hash_password(pwd)
+            active_section = "hashing-tools"
 
         elif action == "verify_password":
             pwd = request.form.get("verify_pwd", "")
             hashed_pwd = request.form.get("hashed_pwd", "")
             password_verified = verify_password(pwd, hashed_pwd)
+            active_section = "hashing-tools"
 
     return render_template(
         "index.html",
@@ -271,7 +281,8 @@ def index():
         base64_decoded=base64_decoded,
         hashed_password=hashed_password,
         password_verified=password_verified,
-        custom_password=custom_password
+        custom_password=custom_password,
+        active_section=active_section
     )
 
 

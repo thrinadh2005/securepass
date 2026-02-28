@@ -5,16 +5,47 @@
     <title>SecurePass - Advanced Security Tools</title>
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
     <style>
+        :root {
+            --bg: #f4f6f9;
+            --card-bg: #ffffff;
+            --text: #212529;
+            --muted: #6c757d;
+            --primary: #0069d9;
+            --primary-contrast: #ffffff;
+            --shadow: 0 6px 18px rgba(0,0,0,0.08);
+            --radius: 14px;
+        }
+        [data-theme="dark"] {
+            --bg: #0f1115;
+            --card-bg: #151821;
+            --text: #e9ecef;
+            --muted: #adb5bd;
+            --primary: #4c8bff;
+            --primary-contrast: #0f1115;
+            --shadow: 0 8px 24px rgba(0,0,0,0.35);
+        }
+        body {
+            background: var(--bg);
+            color: var(--text);
+        }
+        .app-header {
+            border-bottom: 1px solid rgba(0,0,0,0.06);
+        }
+        .brand-title {
+            font-weight: 700;
+            letter-spacing: .3px;
+        }
         .tool-section {
-            margin-bottom: 20px;
-            border: 1px solid #dee2e6;
-            border-radius: 8px;
-            padding: 20px;
-            background: #f8f9fa;
+            margin-bottom: 24px;
+            border: 1px solid rgba(0,0,0,0.08);
+            border-radius: var(--radius);
+            padding: 22px;
+            background: var(--card-bg);
+            box-shadow: var(--shadow);
         }
         .entropy-meter {
             height: 20px;
-            background: #e9ecef;
+            background: rgba(0,0,0,0.08);
             border-radius: 10px;
             overflow: hidden;
         }
@@ -25,16 +56,81 @@
         .entropy-weak { background: #dc3545; }
         .entropy-medium { background: #ffc107; }
         .entropy-strong { background: #28a745; }
+        .sidebar-card {
+            border-radius: var(--radius);
+            background: var(--card-bg);
+            box-shadow: var(--shadow);
+            padding: 16px;
+        }
+        .list-group-item {
+            background: transparent;
+            color: var(--text);
+            border: 0;
+            border-radius: 10px;
+        }
+        .list-group-item a {
+            color: var(--text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .list-group-item:hover {
+            background: rgba(0,0,0,0.05);
+        }
+        .section-hidden { display: none; }
+        .section-visible { display: block; animation: fadeIn .25s ease; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+        .tool-tabs .nav-link {
+            border-radius: 20px;
+            background: transparent;
+            color: var(--text);
+            margin-right: 8px;
+        }
+        .tool-tabs .nav-link.active {
+            background: var(--primary);
+            color: var(--primary-contrast);
+        }
     </style>
 </head>
 <body>
-    <div class="container mt-4">
-        <h1 class="text-center mb-4">🔐 SecurePass - Advanced Security Tools</h1>
-        <p class="text-center text-muted">Comprehensive Password Security & Cryptography Suite</p>
-        
+    <nav class="navbar navbar-expand-lg app-header" style="background: var(--card-bg);">
+        <div class="container-fluid">
+            <span class="navbar-brand brand-title">🔐 SecurePass</span>
+            <div class="ml-auto">
+                <button id="themeToggle" class="btn btn-sm" style="background: var(--primary); color: var(--primary-contrast); border-radius: 20px;">Toggle Theme</button>
+            </div>
+        </div>
+    </nav>
+
+    <div class="container-fluid mt-4">
+        <div class="row">
+            <div class="col-md-3 mb-4">
+                <div class="sidebar-card">
+                    <h5 class="mb-3">Start</h5>
+                    <ul class="list-group">
+                        <li class="list-group-item"><a href="#" onclick="showSection('password-strength')"><span>🔍 Password Strength Checker</span><span class="badge badge-primary">Analyze</span></a></li>
+                        <li class="list-group-item"><a href="#" onclick="showSection('password-generator')"><span>🎲 Advanced Password Generator</span><span class="badge badge-success">Create</span></a></li>
+                        <li class="list-group-item"><a href="#" onclick="showSection('hashing-tools')"><span>🔐 Hashing Tools</span><span class="badge badge-warning">Hash</span></a></li>
+                        <li class="list-group-item"><a href="#" onclick="showSection('encoding-tools')"><span>🔄 Encoding Tools</span><span class="badge badge-info">Encode</span></a></li>
+                        <li class="list-group-item"><a href="#" onclick="showSection('encryption')"><span>🔒 AES Encryption</span><span class="badge badge-secondary">Encrypt</span></a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="tool-section">
+                    <ul class="nav nav-pills tool-tabs mb-3">
+                        <li class="nav-item"><a class="nav-link" href="#" data-id="password-strength" onclick="showSection('password-strength')">🔍 Strength</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-id="password-generator" onclick="showSection('password-generator')">🎲 Generator</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-id="hashing-tools" onclick="showSection('hashing-tools')">🔐 Hashing</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-id="encoding-tools" onclick="showSection('encoding-tools')">🔄 Encoding</a></li>
+                        <li class="nav-item"><a class="nav-link" href="#" data-id="encryption" onclick="showSection('encryption')">🔒 Encryption</a></li>
+                    </ul>
+                </div>
+
         <div class="row">
             <!-- Password Strength Checker -->
-            <div class="col-lg-6 mb-4">
+            <div id="password-strength" class="col-12 mb-4 section-hidden">
                 <div class="tool-section">
                     <h5 class="mb-3">🔍 Password Strength Checker</h5>
                     <form method="POST">
@@ -76,7 +172,7 @@
             </div>
 
             <!-- Advanced Password Generator -->
-            <div class="col-lg-6 mb-4">
+            <div id="password-generator" class="col-12 mb-4 section-hidden">
                 <div class="tool-section">
                     <h5 class="mb-3">🎲 Advanced Password Generator</h5>
                     <form method="POST">
@@ -121,7 +217,7 @@
 
         <div class="row">
             <!-- Hashing Tools -->
-            <div class="col-lg-6 mb-4">
+            <div id="hashing-tools" class="col-12 mb-4 section-hidden">
                 <div class="tool-section">
                     <h5 class="mb-3">🔐 Hashing Tools</h5>
                     
@@ -178,7 +274,7 @@
             </div>
 
             <!-- Encoding Tools -->
-            <div class="col-lg-6 mb-4">
+            <div id="encoding-tools" class="col-12 mb-4 section-hidden">
                 <div class="tool-section">
                     <h5 class="mb-3">🔄 Encoding Tools</h5>
                     
@@ -221,10 +317,9 @@
 
         <!-- Original Encryption Section -->
         <div class="row">
-            <div class="col-12">
+            <div id="encryption" class="col-12 section-hidden">
                 <div class="tool-section">
                     <h5 class="mb-3">🔒 AES Encryption (Fernet)</h5>
-                    <p class="small text-muted">Session Key: <code>{{ show_key }}</code></p>
                     
                     <div class="row">
                         <div class="col-md-6">
@@ -264,22 +359,125 @@
                 </div>
             </div>
         </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="tool-section">
+                    <h5 class="mb-3">Results</h5>
+                    {% if result %}
+                        <div class="mb-2"><strong>Strength:</strong> {{ result }}</div>
+                    {% endif %}
+                    {% if entropy %}
+                        <div class="mb-2"><strong>Entropy:</strong> {{ entropy }} bits</div>
+                    {% endif %}
+                    {% if suggested_password %}
+                        <div class="mb-2"><strong>Suggested:</strong> <code id="result-suggested">{{ suggested_password }}</code> <button class="btn btn-sm btn-outline-primary ml-2" onclick="copyToClipboard('result-suggested')">Copy</button></div>
+                    {% endif %}
+                    {% if custom_password %}
+                        <div class="mb-2"><strong>Generated:</strong> <code id="result-generated">{{ custom_password }}</code> <button class="btn btn-sm btn-outline-primary ml-2" onclick="copyToClipboard('result-generated')">Copy</button></div>
+                    {% endif %}
+                    {% if sha256_result %}
+                        <div class="mb-2"><strong>SHA256:</strong> <code id="result-sha256">{{ sha256_result }}</code> <button class="btn btn-sm btn-outline-primary ml-2" onclick="copyToClipboard('result-sha256')">Copy</button></div>
+                    {% endif %}
+                    {% if base64_encoded %}
+                        <div class="mb-2"><strong>Base64 Encoded:</strong> <code id="result-b64e">{{ base64_encoded }}</code> <button class="btn btn-sm btn-outline-primary ml-2" onclick="copyToClipboard('result-b64e')">Copy</button></div>
+                    {% endif %}
+                    {% if base64_decoded %}
+                        <div class="mb-2"><strong>Base64 Decoded:</strong> <code id="result-b64d">{{ base64_decoded }}</code> <button class="btn btn-sm btn-outline-primary ml-2" onclick="copyToClipboard('result-b64d')">Copy</button></div>
+                    {% endif %}
+                    {% if encrypted %}
+                        <div class="mb-2"><strong>Ciphertext:</strong> <code id="result-enc">{{ encrypted }}</code> <button class="btn btn-sm btn-outline-secondary ml-2" onclick="copyToClipboard('result-enc')">Copy</button></div>
+                    {% endif %}
+                    {% if decrypted %}
+                        <div class="mb-2"><strong>Plaintext:</strong> {{ decrypted }}</div>
+                    {% endif %}
+                    {% if hashed_password %}
+                        <div class="mb-2"><strong>Hashed:</strong> <code id="result-hash">{{ hashed_password }}</code> <button class="btn btn-sm btn-outline-primary ml-2" onclick="copyToClipboard('result-hash')">Copy</button></div>
+                    {% endif %}
+                    {% if password_verified != None %}
+                        <div class="mb-2"><strong>Verification:</strong> {{ 'Password Match!' if password_verified else 'Password Does Not Match!' }}</div>
+                    {% endif %}
+                    {% if not (result or entropy or suggested_password or custom_password or sha256_result or base64_encoded or base64_decoded or encrypted or decrypted or hashed_password or password_verified != None) %}
+                        <div class="text-muted">No results yet. Perform an action to see output here.</div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast-container position-fixed p-3" style="top: 70px; right: 20px; z-index: 1080;">
+        <div id="spToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true" data-delay="1600">
+            <div class="toast-body"></div>
+        </div>
     </div>
 
     <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.4/dist/umd/popper.min.js"></script>
     <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
     <script>
+        function showSection(id) {
+            var ids = ['password-strength','password-generator','hashing-tools','encoding-tools','encryption'];
+            ids.forEach(function(s) {
+                var el = document.getElementById(s);
+                if (el) { el.classList.remove('section-visible'); el.classList.add('section-hidden'); }
+            });
+            var target = document.getElementById(id);
+            if (target) {
+                target.classList.remove('section-hidden');
+                target.classList.add('section-visible');
+                window.location.hash = id;
+                var y = target.getBoundingClientRect().top + window.scrollY - 20;
+                window.scrollTo({ top: y, behavior: 'smooth' });
+            }
+            var links = document.querySelectorAll('.tool-tabs .nav-link');
+            links.forEach(function(l){ l.classList.remove('active'); });
+            var active = document.querySelector('.tool-tabs .nav-link[data-id="'+id+'"]');
+            if (active) active.classList.add('active');
+        }
+        function applyTheme(t) {
+            document.body.setAttribute('data-theme', t);
+            try { localStorage.setItem('sp-theme', t); } catch(e) {}
+        }
         function copyToClipboard(elementId) {
             const element = document.getElementById(elementId);
             const text = element.textContent || element.innerText;
             navigator.clipboard.writeText(text).then(() => {
-                alert('Text copied to clipboard!');
+                var t = document.getElementById('spToast');
+                if (t) {
+                    t.querySelector('.toast-body').textContent = 'Copied to clipboard';
+                    try { $('.toast').toast('show'); } catch(e) {}
+                }
             }).catch(err => {
                 console.error('Failed to copy text: ', err);
-                alert('Failed to copy text.');
+                var t = document.getElementById('spToast');
+                if (t) {
+                    t.querySelector('.toast-body').textContent = 'Copy failed';
+                    try { $('.toast').toast('show'); } catch(e) {}
+                }
             });
         }
+        (function() {
+            var active = "{{ active_section or '' }}";
+            if (active) {
+                showSection(active);
+            } else if (window.location.hash) {
+                var hash = window.location.hash.substring(1);
+                showSection(hash);
+            }
+            var saved = null;
+            try { saved = localStorage.getItem('sp-theme'); } catch(e) {}
+            applyTheme(saved || 'light');
+            var btn = document.getElementById('themeToggle');
+            if (btn) {
+                btn.addEventListener('click', function() {
+                    var current = document.body.getAttribute('data-theme') || 'light';
+                    applyTheme(current === 'light' ? 'dark' : 'light');
+                });
+            }
+            var defaultTab = document.querySelector('.tool-tabs .nav-link[data-id="'+(active || (window.location.hash ? window.location.hash.substring(1) : 'password-strength'))+'"]');
+            if (defaultTab) defaultTab.classList.add('active');
+        })();
     </script>
 </body>
 </html>
