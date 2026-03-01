@@ -10,8 +10,6 @@ from cryptography.hazmat.primitives import hashes
 from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from cryptography.hazmat.primitives import padding
 from cryptography.hazmat.primitives.ciphers import Cipher, algorithms, modes
-from cryptography.hazmat.primitives.asymmetric import rsa, padding as asym_padding
-import hmac
 import threading
 import webbrowser
 import os
@@ -193,75 +191,6 @@ def verify_password(password, hashed_password):
 key = Fernet.generate_key()
 cipher_suite = Fernet(key)
 
-rsa_private_key = None
-rsa_public_key_pem = None
-
-def rsa_generate_keys():
-    global rsa_private_key, rsa_public_key_pem
-    rsa_private_key = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-    public_key = rsa_private_key.public_key()
-    from cryptography.hazmat.primitives import serialization
-    rsa_public_key_pem = public_key.public_bytes(
-        encoding=serialization.Encoding.PEM,
-        format=serialization.PublicFormat.SubjectPublicKeyInfo
-    ).decode()
-    return rsa_public_key_pem
-
-def rsa_encrypt_message(message):
-    global rsa_private_key
-    if rsa_private_key is None:
-        rsa_generate_keys()
-    public_key = rsa_private_key.public_key()
-    ciphertext = public_key.encrypt(
-        message.encode(),
-        asym_padding.OAEP(
-            mgf=asym_padding.MGF1(algorithm=hashes.SHA256()),
-            algorithm=hashes.SHA256(),
-            label=None
-        )
-    )
-    return base64.b64encode(ciphertext).decode()
-
-def rsa_decrypt_message(b64ciphertext):
-    global rsa_private_key
-    if rsa_private_key is None:
-        return "RSA keys not generated"
-    try:
-        ciphertext = base64.b64decode(b64ciphertext.encode())
-        plaintext = rsa_private_key.decrypt(
-            ciphertext,
-            asym_padding.OAEP(
-                mgf=asym_padding.MGF1(algorithm=hashes.SHA256()),
-                algorithm=hashes.SHA256(),
-                label=None
-            )
-        )
-        return plaintext.decode()
-    except Exception:
-        return "Invalid RSA ciphertext"
-
-def compute_digest(text, algorithm="SHA256"):
-    algo = algorithm.upper()
-    if algo == "SHA1":
-        return hashlib.sha1(text.encode()).hexdigest()
-    elif algo == "SHA256":
-        return hashlib.sha256(text.encode()).hexdigest()
-    elif algo == "SHA512":
-        return hashlib.sha512(text.encode()).hexdigest()
-    else:
-        return "Unsupported algorithm"
-
-def hmac_sha256(key_text, message_text):
-    hm = hmac.new(key_text.encode(), message_text.encode(), hashlib.sha256)
-    return hm.hexdigest()
-
-def hmac_verify(key_text, message_text, provided_hex):
-    calc = hmac_sha256(key_text, message_text)
-    try:
-        return hmac.compare_digest(calc, provided_hex.strip())
-    except Exception:
-        return False
-
 @app.route("/", methods=["GET", "POST"])
 def index():
     result = None
@@ -271,17 +200,11 @@ def index():
     suggested_password = None
     entropy = None
     sha256_result = None
-    digest_result = None
     base64_encoded = None
     base64_decoded = None
     hashed_password = None
     password_verified = None
     custom_password = None
-    rsa_public_key = None
-    rsa_ciphertext = None
-    rsa_plaintext = None
-    hmac_result = None
-    hmac_verified = None
     active_section = None
 
     if request.method == "POST":
@@ -322,25 +245,6 @@ def index():
             sha256_result = sha256_hash(text)
             active_section = "hashing-tools"
 
-        elif action == "digest":
-            text = request.form.get("digest_text", "")
-            algo = request.form.get("digest_algo", "SHA256")
-            digest_result = compute_digest(text, algo)
-            active_section = "hashing-tools"
-
-        elif action == "hmac_generate":
-            key_text = request.form.get("hmac_key", "")
-            msg_text = request.form.get("hmac_message", "")
-            hmac_result = hmac_sha256(key_text, msg_text)
-            active_section = "hashing-tools"
-
-        elif action == "hmac_verify":
-            key_text = request.form.get("vhmac_key", "")
-            msg_text = request.form.get("vhmac_message", "")
-            provided_hex = request.form.get("vhmac_provided", "")
-            hmac_verified = hmac_verify(key_text, msg_text, provided_hex)
-            active_section = "hashing-tools"
-
         elif action == "base64_encode":
             text = request.form.get("base64_text", "")
             base64_encoded = base64_encode(text)
@@ -362,20 +266,6 @@ def index():
             password_verified = verify_password(pwd, hashed_pwd)
             active_section = "hashing-tools"
 
-        elif action == "rsa_generate":
-            rsa_public_key = rsa_generate_keys()
-            active_section = "encryption"
-
-        elif action == "rsa_encrypt":
-            msg = request.form.get("rsa_message", "")
-            rsa_ciphertext = rsa_encrypt_message(msg)
-            active_section = "encryption"
-
-        elif action == "rsa_decrypt":
-            enc_b64 = request.form.get("rsa_ciphertext", "")
-            rsa_plaintext = rsa_decrypt_message(enc_b64)
-            active_section = "encryption"
-
     return render_template(
         "index.html",
         result=result,
@@ -385,17 +275,11 @@ def index():
         suggested_password=suggested_password,
         entropy=entropy,
         sha256_result=sha256_result,
-        digest_result=digest_result,
         base64_encoded=base64_encoded,
         base64_decoded=base64_decoded,
         hashed_password=hashed_password,
         password_verified=password_verified,
         custom_password=custom_password,
-        rsa_public_key=rsa_public_key,
-        rsa_ciphertext=rsa_ciphertext,
-        rsa_plaintext=rsa_plaintext,
-        hmac_result=hmac_result,
-        hmac_verified=hmac_verified,
         active_section=active_section
     )
 

@@ -195,25 +195,6 @@
                         <button type="submit" class="btn btn-info">Generate SHA256</button>
                     </form>
                     
-                    <!-- Digest (SHA1/SHA256/SHA512) -->
-                    <h6>Digest (SHA1 / SHA256 / SHA512)</h6>
-                    <form method="POST" class="mb-3">
-                        <input type="hidden" name="action" value="digest">
-                        <div class="form-row">
-                            <div class="col-md-4">
-                                <select name="digest_algo" class="form-control">
-                                    <option value="SHA256" selected>SHA256</option>
-                                    <option value="SHA512">SHA512</option>
-                                    <option value="SHA1">SHA1</option>
-                                </select>
-                            </div>
-                            <div class="col-md-8">
-                                <textarea name="digest_text" class="form-control" rows="2" placeholder="Enter text to hash" required></textarea>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-info mt-2">Generate Digest</button>
-                    </form>
-
                     <!-- Password Hashing -->
                     <h6>Secure Password Hash (PBKDF2)</h6>
                     <form method="POST" class="mb-3">
@@ -233,36 +214,6 @@
                             <input type="text" name="hashed_pwd" class="form-control" placeholder="Enter hashed password" required>
                         </div>
                         <button type="submit" class="btn btn-secondary">Verify Password</button>
-                    </form>
-                    
-                    <!-- HMAC-SHA256 -->
-                    <h6 class="mt-3">HMAC-SHA256</h6>
-                    <form method="POST" class="mb-3">
-                        <input type="hidden" name="action" value="hmac_generate">
-                        <div class="form-row">
-                            <div class="col-md-4">
-                                <input type="text" name="hmac_key" class="form-control" placeholder="Key" required>
-                            </div>
-                            <div class="col-md-8">
-                                <textarea name="hmac_message" class="form-control" rows="2" placeholder="Message" required></textarea>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-info mt-2">Generate HMAC</button>
-                    </form>
-                    <form method="POST">
-                        <input type="hidden" name="action" value="hmac_verify">
-                        <div class="form-row">
-                            <div class="col-md-4">
-                                <input type="text" name="vhmac_key" class="form-control" placeholder="Key" required>
-                            </div>
-                            <div class="col-md-4">
-                                <textarea name="vhmac_message" class="form-control" rows="2" placeholder="Message" required></textarea>
-                            </div>
-                            <div class="col-md-4">
-                                <input type="text" name="vhmac_provided" class="form-control" placeholder="Provided HMAC (hex)" required>
-                            </div>
-                        </div>
-                        <button type="submit" class="btn btn-secondary mt-2">Verify HMAC</button>
                     </form>
                 </div>
             </div>
@@ -324,35 +275,6 @@
                             </form>
                         </div>
                     </div>
-                    
-                    <hr>
-                    <h5 class="mb-3">🔑 RSA (2048, OAEP-SHA256)</h5>
-                    <form method="POST" class="mb-3">
-                        <input type="hidden" name="action" value="rsa_generate">
-                        <button type="submit" class="btn btn-outline-primary">Generate RSA Keys</button>
-                    </form>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <form method="POST" class="mb-3">
-                                <input type="hidden" name="action" value="rsa_encrypt">
-                                <h6>Encrypt with RSA (Public)</h6>
-                                <div class="form-group">
-                                    <textarea name="rsa_message" class="form-control" rows="3" placeholder="Enter message" required></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-success">Encrypt RSA</button>
-                            </form>
-                        </div>
-                        <div class="col-md-6">
-                            <form method="POST">
-                                <input type="hidden" name="action" value="rsa_decrypt">
-                                <h6>Decrypt with RSA (Private)</h6>
-                                <div class="form-group">
-                                    <textarea name="rsa_ciphertext" class="form-control" rows="3" placeholder="Paste RSA ciphertext (Base64)" required></textarea>
-                                </div>
-                                <button type="submit" class="btn btn-secondary">Decrypt RSA</button>
-                            </form>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -383,9 +305,6 @@
                     {% if sha256_result %}
                         <div class="mb-2"><strong>SHA256:</strong> <code id="result-sha256">{{ sha256_result }}</code> <button class="btn btn-sm btn-outline-primary ml-2" onclick="copyToClipboard('result-sha256')">Copy</button></div>
                     {% endif %}
-                    {% if digest_result %}
-                        <div class="mb-2"><strong>Digest:</strong> <code id="result-digest">{{ digest_result }}</code> <button class="btn btn-sm btn-outline-primary ml-2" onclick="copyToClipboard('result-digest')">Copy</button></div>
-                    {% endif %}
                     {% if base64_encoded %}
                         <div class="mb-2"><strong>Base64 Encoded:</strong> <code id="result-b64e">{{ base64_encoded }}</code> <button class="btn btn-sm btn-outline-primary ml-2" onclick="copyToClipboard('result-b64e')">Copy</button></div>
                     {% endif %}
@@ -403,21 +322,6 @@
                     {% endif %}
                     {% if password_verified != None %}
                         <div class="mb-2"><strong>Verification:</strong> {{ 'Password Match!' if password_verified else 'Password Does Not Match!' }}</div>
-                    {% endif %}
-                    {% if hmac_result %}
-                        <div class="mb-2"><strong>HMAC-SHA256:</strong> <code id="result-hmac">{{ hmac_result }}</code> <button class="btn btn-sm btn-outline-primary ml-2" onclick="copyToClipboard('result-hmac')">Copy</button></div>
-                    {% endif %}
-                    {% if hmac_verified != None %}
-                        <div class="mb-2"><strong>HMAC Verify:</strong> {{ 'Valid' if hmac_verified else 'Invalid' }}</div>
-                    {% endif %}
-                    {% if rsa_public_key %}
-                        <div class="mb-2"><strong>RSA Public Key (PEM):</strong><br><code id="result-rsa-pub">{{ rsa_public_key }}</code> <button class="btn btn-sm btn-outline-primary ml-2" onclick="copyToClipboard('result-rsa-pub')">Copy</button></div>
-                    {% endif %}
-                    {% if rsa_ciphertext %}
-                        <div class="mb-2"><strong>RSA Ciphertext:</strong> <code id="result-rsa-enc">{{ rsa_ciphertext }}</code> <button class="btn btn-sm btn-outline-secondary ml-2" onclick="copyToClipboard('result-rsa-enc')">Copy</button></div>
-                    {% endif %}
-                    {% if rsa_plaintext %}
-                        <div class="mb-2"><strong>RSA Plaintext:</strong> {{ rsa_plaintext }}</div>
                     {% endif %}
                     {% if not (result or entropy or suggested_password or custom_password or sha256_result or base64_encoded or base64_decoded or encrypted or decrypted or hashed_password or password_verified != None) %}
                         <div class="text-muted">No results yet. Perform an action to see output here.</div>
